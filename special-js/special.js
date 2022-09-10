@@ -209,16 +209,17 @@ const special = {
         console.log("Time taken: " + (performance.now() - start) + "ms")
     },
     //Special functions (the good stuff)
-    gcd: function(a, b){
+    gcd: function(n1, n2){
         //greatest common divisor
-        let x = a
-        let y = b
-        while (y != 0){
-            let temp = y
-            y = x % y
-            x = temp
+        var gcd = 1;
+ 
+        for (var i = 1; i <= n1 && i <= n2; ++i) {
+            // Checks if i is factor of both integers
+            if (n1 % i == 0 && n2 % i == 0) {
+                gcd = i;
+            }
         }
-        return x
+        return gcd;
     },
     lcm: function(a, b){
         //least common multiple
@@ -289,7 +290,40 @@ const special = {
             let o = special.gamma(n.add(1)).div(special.gamma(r.add(1)).mult(special.gamma(n.sub(r).add(1))))
             return o
         }
-        return special.factorial(n) / (special.factorial(r) * special.factorial(n-r))
+        var p = 1, k = 1;
+ 
+        // C(n, r) == C(n, n-r),
+        // choosing the smaller value
+        if (n - r < r)
+            r = n - r;
+    
+        if (r != 0) {
+            while (r) {
+                p *= n;
+                k *= r;
+    
+                // gcd of p, k
+                var m = special.gcd(p, k);
+    
+                // dividing by gcd, to simplify
+                // product division by their gcd
+                // saves from the overflow
+                p /= m;
+                k /= m;
+    
+                n--;
+                r--;
+            }
+    
+            // k should be simplified to 1
+            // as C(n, r) is a natural number
+            // (denominator should be 1 ) .
+        }
+    
+        else
+            p = 1;
+        
+        return p
     },
     gamma: function(a){
         //gamma function
@@ -325,7 +359,7 @@ const special = {
         }
         return ans
     },
-    riemann_zeta: function(s, prec){
+    riemann_zeta: function(s, prec, only){
         if (s instanceof special.Complex == false){
             s = new special.Complex(s, 0)
         }
@@ -355,13 +389,13 @@ const special = {
             }
             return special.mult(c, S)
         }
-        if (s.real > 1 || s.real == 0){
+        if (s.real > 1 || s.real == 0 || only){
             console.log("Running "+ n +" iterations")
             return f(s)
         }
         else{
             let c = special.mult(special.pow(2, s), special.pow(Math.PI, special.sub(s, 1))).mult(special.sin(special.mult(Math.PI/2, s))).mult(special.gamma(special.sub(1, s)))
-            return special.mult(c, special.riemann_zeta(special.sub(1, s)))
+            return special.mult(c, special.riemann_zeta(special.sub(1, s), prec, true))
         }
     },
     prime_counting: function(x){
@@ -552,7 +586,36 @@ const special = {
             }
         }
         return a
-    }
+    },
+    // hurwitz_zeta: function(s, a, prec){
+    //     if (s instanceof special.Complex == false){
+    //         s = special.complex(s, 0)
+    //     }
+    //     if (a instanceof special.Complex == false){
+    //         a = special.complex(a, 0)
+    //     }
+    //     console.log(special.add(s, a))
+    //     prec = prec == undefined ? 1e-3 : prec
+
+    //     let S = special.complex(0,0)
+    // },
+    // bernoulli_poly: function(n, x, prec){
+    //     if (x instanceof special.Complex == false){
+    //         x = special.complex(x, 0)
+    //     }
+    //     if (n instanceof special.Complex == false){
+    //         n = special.complex(n, 0)
+    //     }
+    //     prec = prec == undefined ? 1e-3 : prec
+
+    //     let s = special.complex(0,0)
+    // },
+    // stieltjes: function(n, prec){
+    //     if (n instanceof special.Complex == false){
+    //         n = special.complex(n, 0)
+    //     }
+    //     prec = prec == undefined ? 1e-3 : prec
+    // }
     
     
     
